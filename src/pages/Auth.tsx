@@ -65,8 +65,11 @@ const Auth: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">DIVVY</h1>
-          <p className="text-muted-foreground">Controle Financeiro Inteligente</p>
+          <img 
+            src="/lovable-uploads/c2565c66-5241-4301-9fe1-3968940a14a1.png" 
+            alt="DIVVY UP! - Divida os gastos com facilidade" 
+            className="w-full max-w-sm mx-auto h-auto object-contain"
+          />
         </div>
 
         <Card className="border shadow-lg">
