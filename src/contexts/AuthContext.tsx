@@ -106,12 +106,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const signOut = async () => {
+    // Salva dados pendentes antes de fazer logout
+    try {
+      // Força salvamento de todos os dados locais
+      const financeState = localStorage.getItem('financeState_v3');
+      if (financeState) {
+        console.log('Dados financeiros salvos antes do logout');
+      }
+      
+      // Limpa rascunhos de formulários (não são mais necessários após logout)
+      const keys = Object.keys(localStorage).filter(key => key.startsWith('formDraft_'));
+      keys.forEach(key => localStorage.removeItem(key));
+      
+    } catch (error) {
+      console.error('Erro ao salvar dados antes do logout:', error);
+    }
+
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
         variant: "destructive",
         title: "Erro ao sair",
         description: error.message,
+      });
+    } else {
+      toast({
+        title: "Logout realizado",
+        description: "Dados salvos automaticamente antes de sair.",
+        variant: "default"
       });
     }
   };

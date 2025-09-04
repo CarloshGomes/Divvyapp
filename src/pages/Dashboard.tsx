@@ -7,6 +7,8 @@ import { TransactionTable } from "@/components/TransactionTable";
 import { FinancialChart } from "@/components/FinancialChart";
 import { ReportsSection } from "@/components/ReportsSection";
 import { useToast } from "@/components/ui/use-toast";
+import { useAutoSave } from "@/hooks/useAutoSave";
+import { useAuth } from "@/contexts/AuthContext";
 
 const generateId = () => {
   return 't_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
@@ -55,8 +57,23 @@ function saveState(state: typeof DEFAULT_STATE) {
 export default function Dashboard() {
   const [state, setState] = useState(loadState);
   const { toast } = useToast();
+  const { signOut } = useAuth();
 
-  // Save state whenever it changes
+  // Auto-save implementation
+  const { forceSave } = useAutoSave({
+    data: state,
+    key: 'financeState_v3',
+    interval: 15000, // Auto-save a cada 15 segundos
+    onSave: () => {
+      console.log('Dados salvos automaticamente');
+    },
+    onBeforeUnload: () => {
+      console.log('Salvando dados antes de sair...');
+      saveState(state);
+    }
+  });
+
+  // Save state whenever it changes (mantém compatibilidade)
   useEffect(() => {
     saveState(state);
   }, [state]);

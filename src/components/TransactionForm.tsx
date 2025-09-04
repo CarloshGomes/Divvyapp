@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { useFormAutoSave } from "@/hooks/useFormAutoSave";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface Transaction {
   id: string;
@@ -44,6 +46,41 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const { toast } = useToast();
+
+  // Auto-save do formulário
+  const { loadDraft, clearDraft, hasDraft } = useFormAutoSave({
+    formData: { type, amount, date, description, category, dueDate },
+    formKey: 'transactionForm'
+  });
+
+  // Carrega rascunho ao montar o componente
+  useEffect(() => {
+    if (hasDraft()) {
+      const draft = loadDraft();
+      if (draft) {
+        const loadData = () => {
+          setType(draft.type || 'expense');
+          setAmount(draft.amount || '');
+          setDate(draft.date || getCurrentDate());
+          setDescription(draft.description || '');
+          setCategory(draft.category || '');
+          setDueDate(draft.dueDate || '');
+        };
+
+        if (confirm('Encontramos um rascunho não finalizado. Deseja carregar os dados salvos?')) {
+          loadData();
+          toast({
+            title: "Rascunho carregado",
+            description: "Dados do formulário restaurados automaticamente",
+            variant: "default"
+          });
+        } else {
+          clearDraft();
+        }
+      }
+    }
+  }, [hasDraft, loadDraft, clearDraft, toast]);
 
   const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
@@ -79,6 +116,9 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
 
     onSubmit(transaction);
     
+    // Limpa o rascunho após envio bem-sucedido
+    clearDraft();
+    
     // Reset form
     setAmount('');
     setDate(getCurrentDate());
@@ -88,6 +128,9 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
   };
 
   const handleClear = () => {
+    // Limpa o rascunho também
+    clearDraft();
+    
     setAmount('');
     setDate(getCurrentDate());
     setDescription('');
