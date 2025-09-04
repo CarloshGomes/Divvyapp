@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Header } from "@/components/Header";
 import { FinancialSummary } from "@/components/FinancialSummary";
 import { TransactionForm, Transaction } from "@/components/TransactionForm";
 import { DebtsList } from "@/components/DebtsList";
 import { TransactionTable } from "@/components/TransactionTable";
+import { FinancialChart } from "@/components/FinancialChart";
+import { ReportsSection } from "@/components/ReportsSection";
 import { useToast } from "@/components/ui/use-toast";
 
 const generateId = () => {
@@ -179,7 +181,7 @@ export default function Dashboard() {
     }
   };
 
-  const summaryData = computeTotals();
+  const summaryData = useMemo(() => computeTotals(), [state]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -198,26 +200,10 @@ export default function Dashboard() {
             onDeleteTransaction={handleDeleteTransaction}
           />
           
-          <div className="bg-card rounded-xl border border-border p-6 shadow-card">
-            <h3 className="text-xl font-bold mb-4">Relatórios</h3>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                <button className="px-4 py-2 text-sm border border-border rounded-lg hover:border-accent transition-colors">
-                  Semana atual
-                </button>
-                <button className="px-4 py-2 text-sm border border-border rounded-lg hover:border-accent transition-colors">
-                  Mês atual
-                </button>
-                <button className="px-4 py-2 text-sm border border-border rounded-lg hover:border-accent transition-colors">
-                  Personalizado
-                </button>
-              </div>
-              <div className="text-center py-8 text-muted-foreground text-sm">
-                📊 Clique em um dos botões para gerar o relatório
-              </div>
-            </div>
-          </div>
+          <ReportsSection transactions={state.transactions} />
         </div>
+
+        <FinancialChart transactions={state.transactions} />
 
         <TransactionTable
           transactions={state.transactions}

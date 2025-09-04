@@ -11,7 +11,8 @@ const Auth: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp, user } = useAuth();
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const { signIn, signUp, user, resetPassword } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,6 +46,19 @@ const Auth: React.FC = () => {
     setIsLoading(true);
     await signUp(email, password);
     setIsLoading(false);
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      alert('Digite seu email para recuperar a senha');
+      return;
+    }
+
+    setIsLoading(true);
+    await resetPassword(email);
+    setIsLoading(false);
+    setShowForgotPassword(false);
   };
 
   return (
@@ -100,6 +114,15 @@ const Auth: React.FC = () => {
                   >
                     {isLoading ? 'Entrando...' : 'Entrar'}
                   </Button>
+                  <div className="text-center mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Esqueci minha senha
+                    </button>
+                  </div>
                 </form>
               </TabsContent>
               
@@ -140,6 +163,51 @@ const Auth: React.FC = () => {
             </Tabs>
           </CardContent>
         </Card>
+
+        {/* Modal de Recuperação de Senha */}
+        {showForgotPassword && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <CardTitle>Recuperar Senha</CardTitle>
+                <CardDescription>
+                  Digite seu email para receber instruções de recuperação
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="forgot-email">Email</Label>
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      placeholder="seu@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      type="submit" 
+                      className="flex-1" 
+                      disabled={isLoading || !email}
+                    >
+                      {isLoading ? 'Enviando...' : 'Enviar'}
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setShowForgotPassword(false)}
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );

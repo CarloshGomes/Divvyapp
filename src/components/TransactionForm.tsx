@@ -189,6 +189,18 @@ export function TransactionForm({ onSubmit }: TransactionFormProps) {
             <Button type="submit" variant="success" className="min-w-32">
               Adicionar
             </Button>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => {
+                setType('income');
+                setCategory('Salário');
+                setDescription('Salário');
+              }}
+              className="min-w-32"
+            >
+              + Salário
+            </Button>
             <Button type="button" variant="secondary" onClick={handleClear}>
               Limpar
             </Button>
