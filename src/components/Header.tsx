@@ -1,11 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, LogOut } from "lucide-react";
+import { Moon, Sun, LogOut, Users, BarChart3 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export function Header() {
   const { theme, setTheme } = useTheme();
   const { signOut, user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -30,9 +33,29 @@ export function Header() {
                 DIVVY
               </h1>
               <p className="text-sm text-muted-foreground">
-                Controle Inteligente de Gastos
+                Sistema de Divisão de Despesas
               </p>
             </div>
+          </div>
+
+          {/* Navegação */}
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant={location.pathname === '/groups' || location.pathname === '/' ? 'default' : 'ghost'} 
+              size="sm"
+              onClick={() => navigate('/groups')}
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Grupos
+            </Button>
+            <Button 
+              variant={location.pathname === '/dashboard' ? 'default' : 'ghost'} 
+              size="sm"
+              onClick={() => navigate('/dashboard')}
+            >
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Financeiro
+            </Button>
           </div>
           
           <div className="flex items-center gap-2">
